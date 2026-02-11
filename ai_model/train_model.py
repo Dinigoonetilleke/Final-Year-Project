@@ -4,9 +4,12 @@ import joblib
 
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.pipeline import Pipeline, FeatureUnion
-from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import FeatureUnion
 from sklearn.metrics import classification_report, confusion_matrix
+
+from imblearn.pipeline import Pipeline as ImbPipeline
+from imblearn.over_sampling import SMOTE
+from sklearn.linear_model import LogisticRegression
 
 
 DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "processed_dataset.csv"
@@ -23,25 +26,31 @@ def main():
         stratify=df["label"]
     )
 
-    # Combine word-level + character-level TF-IDF
     features = FeatureUnion([
         ("word_tfidf", TfidfVectorizer(
             analyzer="word",
             ngram_range=(1, 2),
-            min_df=2
+            min_df=2,
+            lowercase=True
         )),
         ("char_tfidf", TfidfVectorizer(
-            analyzer="char_wb",
-            ngram_range=(3, 5),
-            min_df=2
+            analyzer="char",
+            ngram_range=(2, 6),
+            min_df=2,
+            lowercase=True
         ))
     ])
 
-    model = Pipeline([
+    model = ImbPipeline([
         ("features", features),
+
+        # Oversampling to help minority classes (e.g., Spelling)
+        # If this errors due to sparse matrix issues, we'll switch to RandomOverSampler.
+        ("smote", SMOTE(random_state=42)),
+
         ("clf", LogisticRegression(
-            max_iter=4000,
-            n_jobs=None  # keep safe on Windows
+            max_iter=6000,
+            C=4.0
         ))
     ])
 

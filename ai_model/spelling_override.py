@@ -7,6 +7,13 @@ MISSPELL_PATH = BASE / "data" / "misspelled_dataset.csv"
 _misspell_inputs = None
 _correct_words = None
 
+COMMON_WORDS = {
+    "the","is","are","was","were","am","a","an","to","of","in","on",
+    "and","or","but","for","with","at","by","from","this","that",
+    "you","he","she","they","we","it","his","her","their","my",
+    "wow","bag","late","home","school"
+}
+
 def _load_sets():
     global _misspell_inputs, _correct_words
     if _misspell_inputs is not None:
@@ -15,27 +22,23 @@ def _load_sets():
     import pandas as pd
     df = pd.read_csv(MISSPELL_PATH)
 
-    # Words that are known misspellings
     _misspell_inputs = set(df["input"].astype(str).str.lower().str.strip())
-
-    # Words that are correct forms
     _correct_words = set(df["label"].astype(str).str.lower().str.strip())
 
 
 def spelling_suspects(sentence: str):
     _load_sets()
-    words = re.findall(r"[A-Za-z]+(?:'[A-Za-z]+)?", sentence.lower())
+    words = re.findall(r"[A-Za-z]+", sentence.lower())
 
     suspects = []
 
     for w in words:
-        # Only consider words longer than 2 characters
-        if len(w) <= 2:
+        if len(w) <= 3:
             continue
 
-        # Word is considered misspelled ONLY IF:
-        # 1) It appears in misspelled input column
-        # 2) It does NOT appear as a correct word
+        if w in COMMON_WORDS:
+            continue
+
         if w in _misspell_inputs and w not in _correct_words:
             suspects.append(w)
 

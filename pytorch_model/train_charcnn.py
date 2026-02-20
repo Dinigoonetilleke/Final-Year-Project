@@ -12,7 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 
 
-DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "final_dataset.csv"
+DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "final_dataset_v2.csv"
 OUT_DIR = Path(__file__).resolve().parent
 MODEL_PATH = OUT_DIR / "charcnn.pt"
 

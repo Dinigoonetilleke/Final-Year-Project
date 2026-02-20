@@ -14,7 +14,7 @@ from sklearn.metrics import classification_report
 
 
 # Paths
-DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "processed_dataset.csv"
+DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "final_dataset_v2.csv"
 OUT_DIR = Path(__file__).resolve().parent
 MODEL_PATH = OUT_DIR / "textclf.pt"
 VOCAB_PATH = OUT_DIR / "vocab.json"
@@ -188,3 +188,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+

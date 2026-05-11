@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+# Virtual environments
+venv/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+node_modules/
+frontend/node_modules/
+
+venv/
+.venv/
+
+__pycache__/
+*.pyc
+
+.git/
+
+.env
+backend/.env
+
+dist/
+build/
+
+.vscode/
+.idea/
+
+backend/uploads/
+
+backend/*.json
+
+backend/firebase-service-account.json
+backend/uploads/
+*.db

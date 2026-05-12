@@ -360,6 +360,10 @@ def evaluate_essay():
     essay_text = str(data.get("essay", "")).strip()
     title = str(data.get("title", "Untitled Essay")).strip() or "Untitled Essay"
     user_id = data.get("userId")
+    student_id = data.get("studentId")
+    student_name = str(data.get("studentName", "")).strip()
+    student_number = data.get("studentNumber")
+    batch = data.get("batch")
 
     if not essay_text:
         return jsonify({"error": "Essay text is required."}), 400
@@ -370,12 +374,17 @@ def evaluate_essay():
     essay_ref = db.collection("essays").document()
     essay_ref.set({
         "lecturerId": user_id,
+        "studentId": student_id,
+        "studentName": student_name,
+        "studentNumber": student_number,
+        "batch": batch,
         "title": title,
         "essayText": essay_text,
         "wordCount": result.get("word_count", 0),
         "sentenceCount": result.get("sentence_count", 0),
         "paragraphCount": result.get("paragraph_count", 0),
         "result": result,
+        "lecturerEditedFeedback": "",
         "createdAt": created_at,
     })
 
@@ -383,6 +392,12 @@ def evaluate_essay():
     report_ref.set({
         "essayId": essay_ref.id,
         "lecturerId": user_id,
+        "studentId": student_id,
+        "studentNumber": student_number,
+        "batch": batch,
+        "studentName": student_name,
+        "title": title,
+        "essayText": essay_text,
         "feedback": result,
         "errorSummary": result.get("counts", {}),
         "overallComment": result.get("overall_assessment", {}).get("comment", ""),
@@ -397,7 +412,6 @@ def evaluate_essay():
         "createdAt": created_at,
         "result": result,
     })
-
 
 @app.post("/api/questions/generate")
 def generate_questions():
@@ -506,6 +520,10 @@ def list_reports():
         reports.append({
             "id": doc.id,
             "title": data.get("title", "Untitled Essay"),
+            "studentId": data.get("studentId"),
+            "studentName": data.get("studentName"),
+            "studentNumber": data.get("studentNumber"),
+            "batch": data.get("batch"),
             "sentenceCount": data.get("sentenceCount", 0),
             "paragraphCount": data.get("paragraphCount", 0),
             "wordCount": data.get("wordCount", 0),
@@ -652,6 +670,67 @@ def update_edited_feedback(essay_id: str):
         "message": "Edited feedback saved successfully.",
         "essayId": essay_id,
         "editedFeedback": edited_feedback,
+    })
+
+@app.route('/api/students', methods=['GET'])
+def get_students():
+    user_id = request.args.get('userId')
+
+    students_ref = db.collection('students').where('userId', '==', user_id).stream()
+
+    students = []
+    for doc in students_ref:
+        data = doc.to_dict()
+        data['id'] = doc.id
+        students.append(data)
+
+    return jsonify({'students': students})
+
+
+@app.route('/api/students', methods=['POST'])
+def add_student():
+    data = request.get_json(silent=True) or {}
+
+    student = {
+        'name': data.get('name', ''),
+        'studentNumber': data.get('studentNumber', ''),
+        'batch': data.get('batch', ''),
+        'email': data.get('email', ''),
+        'userId': data.get('userId'),
+        'createdAt': datetime.utcnow().isoformat()
+    }
+
+    doc_ref = db.collection('students').add(student)
+    student['id'] = doc_ref[1].id
+
+    return jsonify({'student': student}), 201
+
+@app.route('/api/students/<student_id>', methods=['PUT'])
+def update_student(student_id):
+    data = request.get_json(silent=True) or {}
+
+    updated_student = {
+        'name': data.get('name', ''),
+        'studentNumber': data.get('studentNumber', ''),
+        'batch': data.get('batch', ''),
+        'email': data.get('email', ''),
+        'updatedAt': datetime.utcnow().isoformat()
+    }
+
+    db.collection('students').document(student_id).update(updated_student)
+
+    updated_student['id'] = student_id
+
+    return jsonify({'student': updated_student})
+
+
+@app.route('/api/students/<student_id>', methods=['DELETE'])
+def delete_student(student_id):
+    db.collection('students').document(student_id).delete()
+
+    return jsonify({
+        'message': 'Student deleted successfully.',
+        'studentId': student_id
     })
 
 if __name__ == "__main__":

@@ -1,10 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Layout from '../components/Layout'
 import { api } from '../lib/api'
 import mammoth from 'mammoth'
 
 export default function EssayEvaluationPage({ user, onLogout }) {
   const [title, setTitle] = useState('Student Essay Report')
+  const [students, setStudents] = useState([])
+  const [studentInput, setStudentInput] = useState('')
+  const [selectedStudentId, setSelectedStudentId] = useState('')
   const [essay, setEssay] = useState('')
   const [result, setResult] = useState(null)
   const [editedFeedback, setEditedFeedback] = useState("")
@@ -13,6 +16,23 @@ export default function EssayEvaluationPage({ user, onLogout }) {
   const [ocrLoading, setOcrLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('rubric')
   const [isOcrText, setIsOcrText] = useState(false)
+  
+  
+  useEffect(() => {
+  async function loadStudents() {
+    try {
+      const data = await api.get(`/students?userId=${user.id}`)
+      setStudents(data.students || [])
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  if (user?.id) {
+    loadStudents()
+  }
+}, [user])
+  
 
   async function handleFileUpload(event) {
     const file = event.target.files[0]
@@ -136,11 +156,19 @@ export default function EssayEvaluationPage({ user, onLogout }) {
     }
 
     try {
+      const selectedStudent = students.find(
+        (student) => student.id === selectedStudentId
+      );
+
       const data = await api.post('/evaluate', {
         title,
         essay,
         userId: user.id,
-      })
+        studentId: selectedStudent?.id || null,
+        studentName: selectedStudent?.name || null,
+        studentNumber: selectedStudent?.studentNumber || null,
+        batch: selectedStudent?.batch || null,
+      });
 
 setResult({
   ...data.result,
@@ -303,6 +331,26 @@ async function handleSaveEditedFeedback() {
           )}
 
           <form className="stack-form" onSubmit={handleSubmit}>
+              
+            <label>
+                Student
+                <select
+                    value={selectedStudentId}
+                    onChange={(e) => {
+                        setSelectedStudentId(e.target.value);
+                    }}
+                >
+                    <option value="">-- Select student --</option>
+
+                    {students.map((student) => (
+                        <option key={student.id} value={student.id}>
+                            {student.name} - {student.studentNumber || "No ID"}
+                            {student.batch ? ` - ${student.batch}` : ""}
+                        </option>
+                    ))}
+                </select>
+            </label>
+              
             <label>
               Report Title
               <input

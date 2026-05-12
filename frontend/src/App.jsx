@@ -10,6 +10,8 @@ import QuestionGenerationPage from './pages/QuestionGenerationPage'
 import ResourcesPage from './pages/ResourcesPage'
 import ReportsStoragePage from './pages/ReportsStoragePage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
+import StudentsPage from './pages/StudentsPage'
+import StudentDetailPage from './pages/StudentDetailPage'
 import './styles.css'
 
 const blankForm = { fullName: '', email: '', password: '', confirmPassword: '' }
@@ -119,6 +121,16 @@ export default function App() {
             </ProtectedRoute>
         }
     />
+    
+    <Route
+        path="/students"
+        element={
+            <ProtectedRoute user={lecturerUser}>
+                <StudentsPage user={lecturerUser} onLogout={logoutLecturer} />
+            </ProtectedRoute>
+        }
+    />
+          
       <Route
         path="/admin"
         element={
@@ -127,7 +139,20 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+          
+      <Route
+        path="/students/:id"
+        element={
+            <ProtectedRoute user={lecturerUser}>
+                <StudentDetailPage user={lecturerUser} onLogout={logoutLecturer} />
+            </ProtectedRoute>
+        }
+    />
+          
     </Routes>
+      
+    
+      
       
   )
 }

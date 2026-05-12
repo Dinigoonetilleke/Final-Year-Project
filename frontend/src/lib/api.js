@@ -1,63 +1,61 @@
-// Base URL of your backend
 const BASE_URL = 'http://127.0.0.1:5000/api';
 
-export const api = {
-  // POST request (login, signup, evaluate, etc.)
-  async post(path, body) {
-    try {
-      const response = await fetch(`${BASE_URL}${path}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      });
+async function handleResponse(response) {
+  let data;
 
-      // Convert response to JSON safely
-      let data;
-      try {
-        data = await response.json();
-      } catch {
-        throw new Error('Invalid server response');
-      }
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error('Invalid server response');
+  }
 
-      // Handle errors
-      if (!response.ok) {
-        throw new Error(data.error || data.message || 'Request failed');
-      }
+  if (!response.ok) {
+    throw new Error(data.error || data.message || 'Request failed');
+  }
 
-      return data;
-    } catch (error) {
-      // This is what caused your "Failed to fetch"
-      if (error.message === 'Failed to fetch') {
-        throw new Error('Cannot connect to backend. Is the server running?');
-      }
-      throw error;
+  return data;
+}
+
+async function request(path, options = {}) {
+  try {
+    const response = await fetch(`${BASE_URL}${path}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      ...options,
+    });
+
+    return await handleResponse(response);
+  } catch (error) {
+    if (error.message === 'Failed to fetch') {
+      throw new Error('Cannot connect to backend. Is the server running?');
     }
+    throw error;
+  }
+}
+
+export const api = {
+  get(path) {
+    return request(path);
   },
 
-  // GET request (dashboard, reports, etc.)
-  async get(path) {
-    try {
-      const response = await fetch(`${BASE_URL}${path}`);
+  post(path, body) {
+    return request(path, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  },
 
-      let data;
-      try {
-        data = await response.json();
-      } catch {
-        throw new Error('Invalid server response');
-      }
+  put(path, body) {
+    return request(path, {
+      method: 'PUT',
+      body: JSON.stringify(body),
+    });
+  },
 
-      if (!response.ok) {
-        throw new Error(data.error || data.message || 'Request failed');
-      }
-
-      return data;
-    } catch (error) {
-      if (error.message === 'Failed to fetch') {
-        throw new Error('Cannot connect to backend. Is the server running?');
-      }
-      throw error;
-    }
+  delete(path) {
+    return request(path, {
+      method: 'DELETE',
+    });
   },
 };

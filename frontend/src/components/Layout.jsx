@@ -7,6 +7,7 @@ export default function Layout({ user, onLogout, title, subtitle, children, admi
         { to: '/dashboard', label: 'Dashboard' },
         { to: '/essay-evaluation', label: 'Essay Evaluation' },
         { to: '/question-generation', label: 'Question Generation' },
+        { to: '/students', label: 'Students' },
         { to: '/resources', label: 'Reports & Storage' },
       ]
 

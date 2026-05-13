@@ -86,9 +86,7 @@ export default function AuthForm({
 
           <div className="auth-footer">{footer}</div>
 
-          <div className="auth-links-row">
-            <Link to="/signup" className="text-link inline-link">Create Lecturer Account</Link>
-          </div>
+          
         </div>
       </div>
 

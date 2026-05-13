@@ -47,7 +47,15 @@ export default function LoginPage({ form, setForm, setMessage, message, loading,
       message={message}
       loading={loading}
       submitLabel="Login"
-      footer={<p className="muted-text">Need an account? <Link to="/signup">Create one now</Link>.</p>}
+      footer={
+        <p className="muted-text">
+            Need an account?{' '}
+            <Link className="auth-link" to="/signup">
+                Create one now
+            </Link>
+            .
+        </p>
+}
     />
   )
 }

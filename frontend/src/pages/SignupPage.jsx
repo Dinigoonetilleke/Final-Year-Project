@@ -55,7 +55,14 @@ export default function SignupPage({ form, setForm, setMessage, message, loading
       message={message}
       loading={loading}
       submitLabel="Create Account"
-      footer={<p className="muted-text">Already registered? <Link to="/login">Go to login</Link>.</p>}
+      footer={
+        <p className="muted-text">
+            Already registered?{' '}
+            <Link className="auth-link" to="/login">
+                Go to login
+            </Link>
+        </p>
+    }
     />
   )
 }

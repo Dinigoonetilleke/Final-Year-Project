@@ -42,14 +42,22 @@ export default function App() {
   }, [adminUser])
 
   function logoutLecturer() {
-    setLecturerUser(null)
-    setMessage(null)
-  }
+  localStorage.removeItem('essay-user')
 
-  function logoutAdmin() {
-    setAdminUser(null)
-    setMessage(null)
-  }
+  setLecturerUser(null)
+  setMessage(null)
+
+  window.location.href = '/'
+}
+
+function logoutAdmin() {
+  localStorage.removeItem('essay-admin')
+
+  setAdminUser(null)
+  setMessage(null)
+
+  window.location.href = '/'
+}
 
   return (
     <Routes>

@@ -1,14 +1,21 @@
 import { NavLink } from 'react-router-dom'
 
 export default function Layout({ user, onLogout, title, subtitle, children, admin = false }) {
-  const navItems = admin
-    ? [{ to: '/admin', label: 'Admin Dashboard' }]
+  const isAdmin = admin || user?.role === 'admin'
+
+  const navItems = isAdmin
+    ? [
+        { to: '/admin', label: 'Admin Dashboard', icon: '📊' },
+        { to: '/admin', label: 'Lecturers', icon: '👩‍🏫' },
+        { to: '/admin', label: 'Essay Records', icon: '📝' },
+        { to: '/admin', label: 'System Monitoring', icon: '⚙️' },
+      ]
     : [
-        { to: '/dashboard', label: 'Dashboard' },
-        { to: '/essay-evaluation', label: 'Essay Evaluation' },
-        { to: '/question-generation', label: 'Question Generation' },
-        { to: '/students', label: 'Students' },
-        { to: '/resources', label: 'Reports & Storage' },
+        { to: '/dashboard', label: 'Dashboard', icon: '🏠' },
+        { to: '/essay-evaluation', label: 'Essay Evaluation', icon: '📝' },
+        { to: '/question-generation', label: 'Question Generation', icon: '❔' },
+        { to: '/students', label: 'Students', icon: '👥' },
+        { to: '/resources', label: 'Reports & Storage', icon: '📁' },
       ]
 
   const initials = (user?.fullName || user?.email || 'U')
@@ -19,46 +26,59 @@ export default function Layout({ user, onLogout, title, subtitle, children, admi
     .toUpperCase()
 
   return (
-    <div className="page-shell">
-      <header className="app-header">
-        <div className="header-left">
-          <img src="/logo.png" alt="App Logo" className="app-logo" />
+    <div className="app-layout">
+      <aside className="sidebar">
+        <div className="sidebar-brand">
+          <img src="/logo.png" alt="App Logo" className="sidebar-logo" />
+          <div>
+            <h1>Smart English</h1>
+            <p>Essay Evaluation System</p>
+          </div>
+        </div>
 
+        <nav className="sidebar-nav">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.label}
+              to={item.to}
+              className={({ isActive }) =>
+                `sidebar-link ${isActive ? 'active' : ''}`
+              }
+            >
+              <span>{item.icon}</span>
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+
+        <div className="sidebar-footer">
+          <p>Logged in as</p>
+          <strong>{isAdmin ? 'System Admin' : 'Lecturer'}</strong>
+        </div>
+      </aside>
+
+      <div className="main-area">
+        <header className="app-header new-header">
           <div>
             <p className="system-label">Smart English Essay Evaluation System</p>
             <h2>{title}</h2>
             {subtitle && <p className="header-subtitle">{subtitle}</p>}
           </div>
-        </div>
 
-        <div className="header-right">
-          <div className="user-profile">
-            <div className="avatar">{initials}</div>
-            <span>{user?.fullName || user?.email}</span>
+          <div className="header-right">
+            <div className="user-profile">
+              <div className="avatar">{initials}</div>
+              <span>{user?.fullName || user?.email}</span>
+            </div>
+
+            <button className="logout-link" onClick={onLogout}>
+              Logout
+            </button>
           </div>
+        </header>
 
-          <button className="logout-link" onClick={onLogout}>
-            Logout
-          </button>
-        </div>
-      </header>
-
-      <nav className="sub-nav clean-nav">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            className={({ isActive }) =>
-              `clean-nav-link ${isActive ? 'active' : ''}`
-            }
-          >
-            {item.label}
-          </NavLink>
-        ))}
-      </nav>
-
-      <main>{children}</main>
+        <main className="main-content">{children}</main>
+      </div>
     </div>
   )
 }
-

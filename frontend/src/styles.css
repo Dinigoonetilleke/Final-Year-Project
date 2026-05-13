@@ -37,6 +37,95 @@ a {
   text-decoration: none;
 }
 
+/* EMERGENCY SIDEBAR FIX */
+
+.app-layout {
+  min-height: 100vh !important;
+  display: grid !important;
+  grid-template-columns: 270px minmax(0, 1fr) !important;
+}
+
+.sidebar {
+  width: 270px !important;
+  min-height: 100vh !important;
+  background: #0f172a !important;
+  color: white !important;
+  padding: 22px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  position: sticky !important;
+  top: 0 !important;
+}
+
+.sidebar-brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding-bottom: 22px !important;
+  border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+.sidebar-logo,
+.sidebar-brand img {
+  width: 44px !important;
+  height: 44px !important;
+  max-width: 44px !important;
+  max-height: 44px !important;
+  min-width: 44px !important;
+  object-fit: cover !important;
+  border-radius: 14px !important;
+}
+
+.sidebar-brand h1 {
+  font-size: 17px !important;
+  margin: 0 !important;
+  color: white !important;
+}
+
+.sidebar-brand p {
+  font-size: 12px !important;
+  margin: 4px 0 0 !important;
+  color: #94a3b8 !important;
+}
+
+.sidebar-nav {
+  display: grid !important;
+  gap: 8px !important;
+  margin-top: 24px !important;
+}
+
+.sidebar-link {
+  display: flex !important;
+  align-items: center !important;
+  gap: 11px !important;
+  padding: 12px 13px !important;
+  border-radius: 13px !important;
+  color: #cbd5e1 !important;
+  font-weight: 700 !important;
+}
+
+.sidebar-link.active,
+.sidebar-link:hover {
+  background: linear-gradient(90deg, #2563eb, #06b6d4) !important;
+  color: white !important;
+}
+
+.sidebar-footer {
+  margin-top: auto !important;
+  background: rgba(255,255,255,0.08) !important;
+  border-radius: 16px !important;
+  padding: 14px !important;
+}
+
+.main-area {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+.main-content {
+  padding: 26px !important;
+}
+
 /* =========================
    Auth / Login / Signup
 ========================= */
@@ -1845,4 +1934,240 @@ textarea:focus {
   .admin-table-row {
     grid-template-columns: 1fr;
   }
+  
+  /* =========================
+   New App Shell with Sidebar
+========================= */
+
+.app-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 270px 1fr;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(37, 99, 235, 0.10), transparent 30%),
+    radial-gradient(circle at 80% 55%, rgba(6, 182, 212, 0.14), transparent 32%),
+    #f8fafc;
+}
+
+.sidebar {
+  min-height: 100vh;
+  background: #0f172a;
+  color: white;
+  padding: 22px 16px;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 8px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  object-fit: cover;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+}
+
+.sidebar-brand h1 {
+  font-size: 17px;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.sidebar-brand p {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 4px 0 0;
+}
+
+.sidebar-nav {
+  display: grid;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px 13px;
+  border-radius: 13px;
+  color: #cbd5e1;
+  font-weight: 700;
+  transition: 0.2s ease;
+}
+
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: white;
+  transform: translateX(2px);
+}
+
+.sidebar-link.active {
+  background: linear-gradient(90deg, #2563eb, #06b6d4);
+  color: white;
+  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.28);
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.sidebar-footer p {
+  margin: 0 0 4px;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.sidebar-footer strong {
+  font-size: 14px;
+}
+
+.main-area {
+  min-width: 0;
+}
+
+.new-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.main-content {
+  padding: 26px;
+}
+
+.admin-page {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+  .app-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: relative;
+    min-height: auto;
+  }
+
+  .sidebar-nav {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .main-content {
+    padding: 18px;
+  }
+}
+
+/* FIX SIDEBAR BREAKING ISSUE */
+
+.app-layout {
+  min-height: 100vh !important;
+  display: grid !important;
+  grid-template-columns: 270px minmax(0, 1fr) !important;
+}
+
+.sidebar {
+  width: 270px !important;
+  min-height: 100vh !important;
+  background: #0f172a !important;
+  color: white !important;
+  padding: 22px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  position: sticky !important;
+  top: 0 !important;
+  overflow: hidden !important;
+}
+
+.sidebar-logo {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  max-width: 44px !important;
+  max-height: 44px !important;
+  border-radius: 14px !important;
+  object-fit: cover !important;
+}
+
+.sidebar-brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.sidebar-brand h1 {
+  font-size: 17px !important;
+  margin: 0 !important;
+}
+
+.sidebar-brand p {
+  font-size: 12px !important;
+  margin: 4px 0 0 !important;
+  color: #94a3b8 !important;
+}
+
+.main-area {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+.main-content {
+  padding: 26px !important;
+}
+
+@media (max-width: 900px) {
+  .app-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .sidebar {
+    width: 100% !important;
+    min-height: auto !important;
+    position: relative !important;
+  }
+}
+
+.sidebar img,
+.sidebar-logo {
+  width: 44px !important;
+  height: 44px !important;
+  max-width: 44px !important;
+  max-height: 44px !important;
+  object-fit: cover !important;
+  border-radius: 14px !important;
+}
+
+.sidebar-brand {
+  overflow: hidden !important;
+}
+
+.sidebar-brand img {
+  flex: 0 0 44px !important;
+}
+.insight-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .insight-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 }

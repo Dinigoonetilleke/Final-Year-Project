@@ -1,22 +1,23 @@
 import { NavLink } from 'react-router-dom'
 
-export default function Layout({ user, onLogout, title, subtitle, children, admin = false }) {
+export default function Layout({ user, onLogout, title, subtitle, children, admin = false,   activeAdminTab = 'dashboard',
+  onAdminTabChange = () => {},}) {
   const isAdmin = admin || user?.role === 'admin'
 
-  const navItems = isAdmin
-    ? [
-        { to: '/admin', label: 'Admin Dashboard', icon: '📊' },
-        { to: '/admin', label: 'Lecturers', icon: '👩‍🏫' },
-        { to: '/admin', label: 'Essay Records', icon: '📝' },
-        { to: '/admin', label: 'System Monitoring', icon: '⚙️' },
-      ]
-    : [
-        { to: '/dashboard', label: 'Dashboard', icon: '🏠' },
-        { to: '/essay-evaluation', label: 'Essay Evaluation', icon: '📝' },
-        { to: '/question-generation', label: 'Question Generation', icon: '❔' },
-        { to: '/students', label: 'Students', icon: '👥' },
-        { to: '/resources', label: 'Reports & Storage', icon: '📁' },
-      ]
+ const navItems = isAdmin
+  ? [
+      { key: 'dashboard', label: 'Admin Dashboard', icon: '📊' },
+      { key: 'lecturers', label: 'Lecturers', icon: '👩‍🏫' },
+      { key: 'records', label: 'Essay Records', icon: '📝' },
+      { key: 'system', label: 'System Monitoring', icon: '⚙️' },
+    ]
+  : [
+      { to: '/dashboard', label: 'Dashboard', icon: '🏠' },
+      { to: '/essay-evaluation', label: 'Essay Evaluation', icon: '📝' },
+      { to: '/question-generation', label: 'Question Generation', icon: '❔' },
+      { to: '/students', label: 'Students', icon: '👥' },
+      { to: '/resources', label: 'Reports & Storage', icon: '📁' },
+    ]
 
   const initials = (user?.fullName || user?.email || 'U')
     .split(' ')
@@ -37,19 +38,31 @@ export default function Layout({ user, onLogout, title, subtitle, children, admi
         </div>
 
         <nav className="sidebar-nav">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.label}
-              to={item.to}
-              className={({ isActive }) =>
-                `sidebar-link ${isActive ? 'active' : ''}`
-              }
-            >
-              <span>{item.icon}</span>
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
+            {navItems.map((item) =>
+                isAdmin ? (
+                    <button
+                        key={item.key}
+                        type="button"
+                        className={`sidebar-link ${activeAdminTab === item.key ? 'active' : ''}`}
+                        onClick={() => onAdminTabChange(item.key)}
+                    >
+                        <span className="sidebar-icon">{item.icon}</span>
+                        <span>{item.label}</span>
+                    </button>
+                ) : (
+                    <NavLink
+                        key={item.label}
+                        to={item.to}
+                        className={({ isActive }) =>
+                            `sidebar-link ${isActive ? 'active' : ''}`
+                        }
+                    >
+                        <span className="sidebar-icon">{item.icon}</span>
+                        <span>{item.label}</span>
+                    </NavLink>
+                )
+            )}
+          </nav>
 
         <div className="sidebar-footer">
           <p>Logged in as</p>

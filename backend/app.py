@@ -733,6 +733,43 @@ def delete_student(student_id):
         'studentId': student_id
     })
 
+@app.delete("/api/admin/users/<user_id>")
+def delete_user(user_id):
+    try:
+        db.collection("users").document(user_id).delete()
+
+        return jsonify({
+            "message": "User deleted successfully.",
+            "userId": user_id
+        })
+
+    except Exception as error:
+        return jsonify({
+            "error": str(error)
+        }), 500
+
+@app.route("/api/admin/users/<user_id>/role", methods=["PUT", "OPTIONS"])
+def update_user_role(user_id):
+    if request.method == "OPTIONS":
+        return jsonify({"status": "ok"}), 200
+
+    data = request.get_json(silent=True) or {}
+    new_role = data.get("role")
+
+    if new_role not in ["admin", "lecturer"]:
+        return jsonify({"error": "Invalid role."}), 400
+
+    db.collection("users").document(user_id).update({
+        "role": new_role,
+        "updatedAt": now_iso(),
+    })
+
+    return jsonify({
+        "message": "User role updated successfully.",
+        "userId": user_id,
+        "role": new_role,
+    })
+
 if __name__ == "__main__":
     ensure_default_admin()
     app.run(debug=True, host="0.0.0.0", port=5000)

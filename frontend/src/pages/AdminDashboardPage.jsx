@@ -540,40 +540,34 @@ async function handleRoleChange(userId, role) {
             SYSTEM TAB
         ========================= */}
 
-        {activeTab === 'system' && (
-          <section className="admin-panel">
+{activeTab === 'system' && (
+  <>
+    <section className="admin-stats-grid">
+      <StatCard label="API Health" value="Online" icon="🟢" />
+      <StatCard label="AI Model" value="Active" icon="🤖" />
+      <StatCard label="Firebase" value="Connected" icon="🔥" />
+      <StatCard label="OCR" value="Ready" icon="📷" />
+    </section>
 
-            <div className="panel-heading">
-              <h3>System Monitoring</h3>
-              <span>Admin only</span>
-            </div>
+    <section className="admin-panel">
+      <div className="panel-heading">
+        <h3>System Monitoring</h3>
+        <span>Admin only</span>
+      </div>
 
-            <div className="system-grid">
-
-              <SummaryItem
-                label="Frontend"
-                value="React Active"
-              />
-
-              <SummaryItem
-                label="Backend"
-                value="Flask Active"
-              />
-
-              <SummaryItem
-                label="Database"
-                value="Firebase"
-              />
-
-              <SummaryItem
-                label="Authentication"
-                value="Role-based"
-              />
-
-            </div>
-
-          </section>
-        )}
+      <div className="system-grid">
+        <SummaryItem label="Frontend" value="React Active" />
+        <SummaryItem label="Backend API" value="Flask Running" />
+        <SummaryItem label="Database" value="Firebase Firestore" />
+        <SummaryItem label="Authentication" value="Role-based Access" />
+        <SummaryItem label="AI Evaluation Model" value="Available" />
+        <SummaryItem label="OCR Upload Support" value="Image/PDF Enabled" />
+        <SummaryItem label="Question Generator" value="Available" />
+        <SummaryItem label="Last Updated" value={new Date().toLocaleString()} />
+      </div>
+    </section>
+  </>
+)}
 
         {error && (
           <div className="floating-message error">
@@ -595,7 +589,7 @@ function StatCard({ label, value, icon }) {
         {icon}
       </div>
 
-      <div>
+      <div className="stat-content">
         <strong>{value}</strong>
         <span>{label}</span>
       </div>

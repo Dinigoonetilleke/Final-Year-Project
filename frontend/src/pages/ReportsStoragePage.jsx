@@ -7,6 +7,9 @@ export default function ReportsStoragePage({ user, onLogout }) {
   const [questions, setQuestions] = useState([])
   const [selectedReport, setSelectedReport] = useState(null)
   const [selectedQuestionSet, setSelectedQuestionSet] = useState(null)
+  const [reportSearch, setReportSearch] = useState('')
+  const [questionSearch, setQuestionSearch] = useState('')
+  const [reportTab, setReportTab] = useState('summary')
 
   useEffect(() => {
     loadStorage()
@@ -22,7 +25,8 @@ export default function ReportsStoragePage({ user, onLogout }) {
 
   async function openReport(id) {
     const data = await api.get(`/reports/${id}`)
-    setSelectedReport(data)
+    setSelectedReport(data.report || data)
+    setReportTab('feedback')
     setSelectedQuestionSet(null)
   }
 
@@ -30,6 +34,18 @@ export default function ReportsStoragePage({ user, onLogout }) {
     setSelectedQuestionSet(item)
     setSelectedReport(null)
   }
+
+  const filteredReports = reports.filter((report) =>
+  `${report.title} ${report.rating}`
+    .toLowerCase()
+    .includes(reportSearch.toLowerCase())
+  )
+
+  const filteredQuestions = questions.filter((item) =>
+  `${item.title}`
+    .toLowerCase()
+    .includes(questionSearch.toLowerCase())
+  )
 
   return (
     <Layout
@@ -41,11 +57,19 @@ export default function ReportsStoragePage({ user, onLogout }) {
       <div className="evaluate-layout">
         <section className="panel">
           <h3>Saved Essay Reports</h3>
+            
+          <input
+    	       className="storage-search"
+               type="text"
+               placeholder="Search essay reports..."
+               value={reportSearch}
+               onChange={(e) => setReportSearch(e.target.value)}
+          />
 
           {reports.length ? (
-            reports.map((report) => (
+            filteredReports.map((report) => (
               <div
-                className="row-item"
+                className="storage-row"
                 key={report.id}
                 onClick={() => openReport(report.id)}
                 style={{ cursor: 'pointer' }}
@@ -65,11 +89,19 @@ export default function ReportsStoragePage({ user, onLogout }) {
 
         <section className="panel">
           <h3>Saved Question Sets</h3>
+            
+            <input
+                className="storage-search"
+                type="text"
+                placeholder="Search question sets..."
+                value={questionSearch}
+                onChange={(e) => setQuestionSearch(e.target.value)}
+            />
 
           {questions.length ? (
-            questions.map((item) => (
+            filteredQuestions.map((item) => (
               <div
-                className="row-item"
+                className="storage-row"
                 key={item.id}
                 onClick={() => openQuestionSet(item)}
                 style={{ cursor: 'pointer' }}
@@ -85,114 +117,217 @@ export default function ReportsStoragePage({ user, onLogout }) {
         </section>
       </div>
 
-      {selectedReport && (
-        <section className="panel" style={{ marginTop: '24px' }}>
-          <h2>{selectedReport.title}</h2>
+{selectedReport && (
+  <div className="report-modal-overlay">
+    <div className="panel report-panel stored-report-modal">
 
-          <div className="feedback-item">
-            <h4>Essay Text</h4>
-            <p>{selectedReport.content}</p>
+      <button
+        className="modal-close"
+        onClick={() => setSelectedReport(null)}
+      >
+        ×
+      </button>
+
+      <div className="report-header">
+        <div>
+          <h2>Evaluation Report</h2>
+          <p>
+            {selectedReport.summary?.overall_assessment?.overview ||
+              'No overview available.'}
+          </p>
+        </div>
+
+        <div className="grade-box">
+          <strong>
+            {selectedReport.summary?.score < 5
+              ? 'F'
+              : selectedReport.summary?.score < 6
+              ? 'D'
+              : selectedReport.summary?.score < 7
+              ? 'C'
+              : selectedReport.summary?.score < 8
+              ? 'B'
+              : 'A'}
+          </strong>
+          <span>
+            {Number(selectedReport.summary?.score || 7.5).toFixed(1)} / 10
+          </span>
+        </div>
+      </div>
+
+      <div className="tabs">
+        <button
+          className={reportTab === 'rubric' ? 'active' : ''}
+          onClick={() => setReportTab('rubric')}
+        >
+          Rubric
+        </button>
+
+        <button
+          className={reportTab === 'errors' ? 'active' : ''}
+          onClick={() => setReportTab('errors')}
+        >
+          Errors (
+          {Object.values(selectedReport.summary?.counts || {}).reduce(
+            (a, b) => a + b,
+            0
+          )}
+          )
+        </button>
+
+        <button
+          className={reportTab === 'feedback' ? 'active' : ''}
+          onClick={() => setReportTab('feedback')}
+        >
+          Feedback
+        </button>
+
+        <button
+          className={reportTab === 'annotated' ? 'active' : ''}
+          onClick={() => setReportTab('annotated')}
+        >
+          Annotated
+        </button>
+      </div>
+
+      <div className="tab-content">
+        {reportTab === 'rubric' && (
+          <div className="rubric-list">
+            {[
+              ['Mechanics', 8],
+              ['Vocabulary', 8],
+              ['Structure', 8],
+              ['Grammar', 8],
+              ['Content', 7.5],
+            ].map(([name, value]) => (
+              <div className="rubric-item" key={name}>
+                <div className="rubric-title">
+                  <strong>{name}</strong>
+                  <span>{Number(value).toFixed(1)} / 10</span>
+                </div>
+
+                <div className="progress-bar">
+                  <div
+                    className="progress-fill"
+                    style={{ width: `${value * 10}%` }}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
+        )}
 
-          <div className="feedback-item">
-            <h4>Overall Feedback</h4>
-            <p>{selectedReport.summary?.overall_assessment?.overview}</p>
+        {reportTab === 'errors' && (
+          <div className="errors-list">
+            {selectedReport.summary?.grouped &&
+              Object.entries(selectedReport.summary.grouped).map(
+                ([category, items]) =>
+                  items.map((item, index) => (
+                    <div className="error-card" key={`${category}-${index}`}>
+                      <div className="error-card-header">
+                        <span className="error-type">
+                          {category.replaceAll('_', ' ')}
+                        </span>
+                        <span className="severity high">High</span>
+                      </div>
 
-            {selectedReport.summary?.overall_assessment?.improvements?.length > 0 && (
+                      <div className="error-text">
+                        “{item.spelling_suspects?.[0] || item.sentence}”
+                      </div>
+
+                      <p>{item.reason || 'Possible issue detected.'}</p>
+
+                      <p className="suggestion">
+                        → Suggest:{' '}
+                        {item.suggestion ||
+                          selectedReport.summary?.tips?.[category] ||
+                          'Review carefully.'}
+                      </p>
+                    </div>
+                  ))
+              )}
+          </div>
+        )}
+
+        {reportTab === 'feedback' && (
+          <div className="editable-feedback-box">
+            <label className="feedback-label">
+              Lecturer Editable Feedback
+            </label>
+
+            <textarea
+              className="feedback-textarea"
+              value={
+                selectedReport.lecturerEditedFeedback ||
+                'No edited feedback saved yet.'
+              }
+              readOnly
+              rows={14}
+            />
+          </div>
+        )}
+
+        {reportTab === 'annotated' && (
+          <div className="annotated-box">
+            {selectedReport.content}
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
+      {selectedQuestionSet && (
+  <div className="report-modal-overlay">
+    <div className="report-modal">
+
+      <button
+        className="modal-close"
+        onClick={() => setSelectedQuestionSet(null)}
+      >
+        ×
+      </button>
+
+      <div className="report-header">
+        <div>
+          <h2>{selectedQuestionSet.title}</h2>
+          <p className="muted-text">
+            {selectedQuestionSet.questionCount} generated questions
+          </p>
+        </div>
+
+        <div className="report-grade">
+          Questions
+        </div>
+      </div>
+
+      <div className="question-modal-list">
+        {selectedQuestionSet.questions?.map((question, index) => (
+          <div className="question-modal-card" key={`${question.type}-${index}`}>
+            <strong>
+              {index + 1}. {question.type}
+            </strong>
+
+            <p>{question.question}</p>
+
+            {question.options?.length > 0 && (
               <ul>
-                {selectedReport.summary.overall_assessment.improvements.map((item) => (
-                  <li key={item}>{item}</li>
+                {question.options.map((option) => (
+                  <li key={option}>{option}</li>
                 ))}
               </ul>
             )}
+
+            <small>
+              Answer: {question.answer}
+            </small>
           </div>
+        ))}
+      </div>
 
-          <div className="feedback-item">
-            <h4>Essay Metrics</h4>
-            <p>
-              Readability: {selectedReport.summary?.essay_metrics?.readabilityScore} (
-              {selectedReport.summary?.essay_metrics?.readabilityLevel})
-            </p>
-            <p>
-              Average sentence length:{' '}
-              {selectedReport.summary?.average_sentence_length} words
-            </p>
-            <p>
-              Lexical diversity:{' '}
-              {selectedReport.summary?.essay_metrics?.lexicalDiversity}
-            </p>
-          </div>
-
-          <div className="feedback-item">
-            <h4>Issue Counts</h4>
-            <div className="chips-wrap">
-              {Object.entries(selectedReport.summary?.counts || {}).map(([key, value]) => (
-                <span className="chip" key={key}>
-                  {key.replaceAll('_', ' ')}: {value}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="feedback-item">
-            <h4>Detailed Sentence Feedback</h4>
-
-            {Object.keys(selectedReport.summary?.grouped || {}).length ? (
-              Object.entries(selectedReport.summary.grouped).map(([category, items]) => (
-                <div key={category} className="feedback-group">
-                  <h5>{category.replaceAll('_', ' ')}</h5>
-
-                  {items.map((item) => (
-                    <div key={`${category}-${item.sentence_no}`} className="sentence-feedback">
-                      <p>
-                        <b>Sentence {item.sentence_no}:</b> {item.sentence}
-                      </p>
-                      <p>
-                        <b>Reason:</b> {item.reason || 'Possible issue detected.'}
-                      </p>
-                      <p>
-                        <b>Suggestion:</b>{' '}
-                        {item.suggestion || 'Review this sentence carefully.'}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ))
-            ) : (
-              <p className="muted-text">No detailed sentence issues detected.</p>
-            )}
-          </div>
-        </section>
-      )}
-
-      {selectedQuestionSet && (
-        <section className="panel" style={{ marginTop: '24px' }}>
-          <h2>{selectedQuestionSet.title}</h2>
-          <p className="muted-text">
-            {selectedQuestionSet.questionCount} questions generated
-          </p>
-
-          {selectedQuestionSet.questions?.map((question, index) => (
-            <div className="feedback-item" key={`${question.type}-${index}`}>
-              <strong>
-                {index + 1}. {question.type}
-              </strong>
-
-              <p>{question.question}</p>
-
-              {question.options?.length > 0 && (
-                <ul>
-                  {question.options.map((option) => (
-                    <li key={option}>{option}</li>
-                  ))}
-                </ul>
-              )}
-
-              <small>Answer: {question.answer}</small>
-            </div>
-          ))}
-        </section>
-      )}
+    </div>
+  </div>
+)}
     </Layout>
   )
 }

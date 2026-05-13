@@ -554,6 +554,7 @@ def report_detail(essay_id: str):
         "wordCount": data.get("wordCount", 0),
         "createdAt": data.get("createdAt", ""),
         "summary": data.get("result", {}),
+        "lecturerEditedFeedback": data.get("lecturerEditedFeedback", ""),
     })
 
 
@@ -629,6 +630,7 @@ def admin_overview():
         data = doc.to_dict()
         users.append({
             "id": doc.id,
+            "full_name": data.get("fullName", ""),
             "full_name": data.get("fullName", ""),
             "email": data.get("email", ""),
             "role": data.get("role", ""),

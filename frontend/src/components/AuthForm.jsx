@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import { useState } from 'react'
 
 export default function AuthForm({
@@ -30,63 +29,70 @@ export default function AuthForm({
   }
 
   return (
-    <div className="screen-shell">
+    <div className="screen-shell auth-shell">
       <div className="brand-bar">Smart English Essay Evaluation System</div>
 
-      <div className="center-wrap">
-        <div className="auth-card">
-          <img src="/src/assets/logo.png" className="logo" alt="Smart Essay Logo" />
+      <div className="auth-split-wrap">
+        <div className="auth-split-card">
+          <div className="auth-visual-side">
+            <img src="/auth-illustration.png" alt="Essay evaluation workspace" />
+          </div>
 
-          <h1>{title}</h1>
+          <div className="auth-form-side">
+            <div className="auth-card refined-auth-card">
+              <img src="/src/assets/logo.png" className="logo" alt="Smart Essay Logo" />
 
-          <p className="tagline">
-            <span>AI-powered</span> support for essay evaluation and question generation
-          </p>
+              <h1>{title}</h1>
 
-          {message && <div className={`message ${message.type}`}>{message.text}</div>}
+              <p className="tagline">
+                <span>AI-powered</span> support for essay evaluation and question generation
+              </p>
 
-          <form className="stack-form" onSubmit={onSubmit}>
-            {fields.map((field) => {
-              const isPassword = field.type === 'password'
-              const inputType = isPassword && visiblePasswords[field.name] ? 'text' : field.type || 'text'
+              {message && <div className={`message ${message.type}`}>{message.text}</div>}
 
-              return (
-                <label key={field.name}>
-                  {field.label}
+              <form className="stack-form" onSubmit={onSubmit}>
+                {fields.map((field) => {
+                  const isPassword = field.type === 'password'
+                  const inputType =
+                    isPassword && visiblePasswords[field.name] ? 'text' : field.type || 'text'
 
-                  <div className="input-wrapper">
-                    <span className="input-icon">{getIcon(field)}</span>
+                  return (
+                    <label key={field.name}>
+                      {field.label}
 
-                    <input
-                      name={field.name}
-                      type={inputType}
-                      value={form[field.name] || ''}
-                      placeholder={field.placeholder}
-                      onChange={onChange}
-                    />
+                      <div className="input-wrapper">
+                        <span className="input-icon">{getIcon(field)}</span>
 
-                    {isPassword && (
-                      <button
-                        type="button"
-                        className="password-toggle icon-toggle"
-                        onClick={() => togglePassword(field.name)}
-                      >
-                        {visiblePasswords[field.name] ? '🙈' : '👁️'}
-                      </button>
-                    )}
-                  </div>
-                </label>
-              )
-            })}
+                        <input
+                          name={field.name}
+                          type={inputType}
+                          value={form[field.name] || ''}
+                          placeholder={field.placeholder}
+                          onChange={onChange}
+                        />
 
-            <button className="primary-btn" disabled={loading} type="submit">
-              {loading ? <span className="spinner"></span> : submitLabel}
-            </button>
-          </form>
+                        {isPassword && (
+                          <button
+                            type="button"
+                            className="password-toggle icon-toggle"
+                            onClick={() => togglePassword(field.name)}
+                          >
+                            {visiblePasswords[field.name] ? '🙈' : '👁️'}
+                          </button>
+                        )}
+                      </div>
+                    </label>
+                  )
+                })}
 
-          <div className="auth-footer">{footer}</div>
+                <button className="primary-btn" disabled={loading} type="submit">
+                  {loading ? <span className="spinner"></span> : submitLabel}
+                </button>
+              </form>
 
-          
+              <div className="auth-footer">{footer}</div>
+            </div>
+          </div>
         </div>
       </div>
 

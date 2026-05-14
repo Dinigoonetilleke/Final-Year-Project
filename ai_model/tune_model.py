@@ -5,7 +5,7 @@ import joblib
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import FeatureUnion
-from sklearn.linear_model import LogisticRegression
+from sklearn.svm import LinearSVC
 from sklearn.metrics import classification_report, confusion_matrix
 
 from imblearn.pipeline import Pipeline as ImbPipeline
@@ -18,14 +18,24 @@ MODEL_OUT = Path(__file__).resolve().parent / "essay_error_model.joblib"
 
 def build_pipeline():
     features = FeatureUnion([
-        ("word_tfidf", TfidfVectorizer(lowercase=True)),
-        ("char_tfidf", TfidfVectorizer(lowercase=True)),
-    ])
+    ("word_tfidf", TfidfVectorizer(
+        analyzer="word",
+        lowercase=True,
+        ngram_range=(1, 2),
+        min_df=2
+    )),
+    ("char_tfidf", TfidfVectorizer(
+        analyzer="char",
+        lowercase=True,
+        ngram_range=(2, 6),
+        min_df=2
+    )),
+])
 
     pipe = ImbPipeline([
         ("features", features),
         ("sampler", SMOTE(random_state=42)),
-        ("clf", LogisticRegression(max_iter=6000))
+        ("clf", LinearSVC())
     ])
     return pipe
 
@@ -63,7 +73,7 @@ def main():
         # classifier
         "clf__C": [1.0, 2.0, 4.0, 8.0],
         "clf__class_weight": [None, "balanced"],
-        "clf__solver": ["liblinear"],  # stable for multinomial-ish setups
+        
     }
 
     grid = GridSearchCV(

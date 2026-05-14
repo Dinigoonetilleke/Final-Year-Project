@@ -116,63 +116,31 @@ def extract_text_image():
         except Exception:
             pass
 
-@app.post("/api/extract-text/pdf")
-def extract_text_pdf():
-    file = request.files.get("file")
-
-    if not file:
-        return jsonify({"error": "No PDF file uploaded."}), 400
-
-    if not allowed_pdf(file.filename):
-        return jsonify({"error": "Only PDF files are allowed."}), 400
-
-    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-
-    safe_name = secure_filename(file.filename)
-    filepath = UPLOAD_DIR / f"{datetime.utcnow().strftime('%Y%m%d%H%M%S%f')}_{safe_name}"
-
+@app.route('/api/extract-text/pdf', methods=['POST'])
+def extract_pdf_text():
     try:
-        file.save(filepath)
+        import fitz  # PyMuPDF
 
-        pages = convert_from_path(str(filepath))
+        if 'file' not in request.files:
+            return jsonify({'error': 'No PDF uploaded'}), 400
 
-        full_text = ""
+        file = request.files['file']
 
-        for i, page in enumerate(pages):
-            image_path = UPLOAD_DIR / f"page_{i}.jpg"
+        pdf_document = fitz.open(stream=file.read(), filetype="pdf")
 
-            page.save(image_path, "JPEG")
+        extracted_text = ""
 
-            text = extract_text_from_image(str(image_path))
-
-            full_text += text + "\n"
-
-            try:
-                image_path.unlink()
-            except:
-                pass
-
-        if not full_text.strip():
-            return jsonify({
-                "error": "No readable English text detected in PDF."
-            }), 422
+        for page in pdf_document:
+            extracted_text += page.get_text()
 
         return jsonify({
-            "message": "Text extracted successfully.",
-            "text": full_text,
+            'text': extracted_text
         })
 
-    except Exception as error:
+    except Exception as e:
         return jsonify({
-            "error": f"Could not extract text from PDF: {str(error)}"
+            'error': str(e)
         }), 500
-
-    finally:
-        try:
-            if filepath.exists():
-                filepath.unlink()
-        except Exception:
-            pass
 
 import re
 from collections import Counter

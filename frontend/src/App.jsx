@@ -142,8 +142,10 @@ function logoutAdmin() {
       <Route
         path="/admin"
         element={
-          <ProtectedRoute user={adminUser} role="admin">
-            <AdminDashboardPage user={adminUser} onLogout={logoutAdmin} />
+          <ProtectedRoute
+			user={adminUser && adminUser.role === 'admin' ? adminUser : null}
+			role="admin"
+		  >	
           </ProtectedRoute>
         }
       />

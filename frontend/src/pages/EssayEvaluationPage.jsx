@@ -71,6 +71,36 @@ export default function EssayEvaluationPage({ user, onLogout }) {
           text: 'DOCX file loaded successfully.',
         })
       }
+	  
+	  else if (extension === 'pdf') {
+		setOcrLoading(true)
+
+		const formData = new FormData()
+		formData.append('file', file)
+
+		const res = await fetch('http://localhost:5000/api/extract-text/pdf', {
+			method: 'POST',
+			body: formData,
+		})
+
+		const data = await res.json()
+
+		if (!res.ok || data.error) {
+			setMessage({
+				type: 'error',
+				text: data.error || 'PDF extraction failed.',
+			})
+			return
+		}
+
+		setEssay(data.text || '')
+		setIsOcrText(true)
+
+		setMessage({
+			type: 'success',
+			text: 'PDF text extracted successfully.',
+		})
+	}
 
       else if (['jpg', 'jpeg', 'png'].includes(extension)) {
         setOcrLoading(true)
@@ -105,7 +135,7 @@ export default function EssayEvaluationPage({ user, onLogout }) {
       else {
         setMessage({
           type: 'error',
-          text: 'Only .txt, .docx, .jpg, .jpeg, and .png files are allowed.',
+          text: 'Only .txt, .docx,pdf, .jpg, .jpeg, and .png files are allowed.',
         })
       }
     } catch (err) {
@@ -365,7 +395,7 @@ async function handleSaveEditedFeedback() {
               <input
                 className="file-input"
                 type="file"
-                accept=".txt,.docx,.jpg,.jpeg,.png"
+                accept=".txt,.docx,.jpg,.jpeg,.png,.pdf"
                 onChange={handleFileUpload}
                 disabled={ocrLoading || loading}
               />

@@ -449,7 +449,7 @@ async function handleRoleChange(userId, role) {
                             onClick={() => handleDeleteUser(item.id)}
                         >
                             Delete
-                        </ button>
+                        </button>
 
                     </div>
 

@@ -222,7 +222,7 @@ Add the Firebase configuration file inside the backend directory before running 
 
 # Author
 
-**Dinithi Weerakkodi Goonetilleke**
+**Dinithi Goonetilleke**
 BSc (Hons) Technology Management - Plymouth University UK
 NSBM Green University
 
@@ -231,3 +231,124 @@ NSBM Green University
 # License
 
 This project was developed for academic and educational purposes as part of a Final Year Computing Project.
+
+
+# Installation Guide
+# How to Run the System
+
+The project contains two main parts:
+
+1. Frontend (React)
+2. Backend (Flask API)
+
+Both servers must run simultaneously.
+
+---
+
+## Step 1 – Clone the Repository
+
+```bash
+git clone https://github.com/Dinigoonetilleke/Final-Year-Project.git
+```
+
+---
+
+## Step 2 – Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend will run on:
+
+```plaintext
+http://localhost:5173
+```
+
+---
+
+## Step 3 – Backend Setup
+
+Open a second terminal:
+
+```bash
+cd backend
+pip install -r requirements.txt
+python app.py
+```
+
+Backend will run on:
+
+```plaintext
+http://127.0.0.1:5000
+```
+
+---
+
+## Step 4 – Open the System
+
+Open the browser and navigate to:
+
+```plaintext
+http://localhost:5173
+```
+
+---
+
+# Step 5 - Database Setup
+
+This system uses Firebase Firestore as the cloud database.
+
+## Required Firestore Collections
+
+Create the following collections in Firebase Firestore:
+
+- users
+- essays
+- reports
+- generated_questions
+- passages
+- students
+
+## Admin User
+
+Create one admin user inside the `users` collection with the following fields:
+
+| Field | Value |
+|---|---|
+| email | admin@smartessay.local |
+| fullName | System Admin |
+| role | admin |
+| password | hashed password from backend registration/login setup |
+| createdAt | current timestamp |
+
+Lecturer users can be created through the signup page.
+
+## Firebase Credentials
+
+The Firebase service account key is not included in this repository for security reasons.  
+To run the system, create a Firebase project, generate a service account key, and place it inside the backend directory as required by the application configuration.
+
+# Demo Login Credentials
+
+## Administrator Account
+
+Email:
+
+```plaintext
+admin@smartessay.local
+```
+
+Password:
+
+```plaintext
+Admin123!
+```
+
+---
+
+## Lecturer Account
+
+Users can create lecturer accounts using the signup page.
